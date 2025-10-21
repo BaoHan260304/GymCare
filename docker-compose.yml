@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  todo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo-api
+    restart: unless-stopped
+    ports:
+      - "1212:1212"
+#    environment:
+#      SERVER_PORT: 1212
+
+#    network_mode: host
