@@ -1,30 +1,17 @@
 package base.api.controller;
 
 import base.api.base.BaseAPIController;
-import base.api.config.EmailService;
 import base.api.config.JwtUtil;
 import base.api.dto.request.*;
-import base.api.dto.response.AuthResponse;
 import base.api.dto.response.TFUResponse;
-import base.api.enums.UserRole;
-import base.api.model.CategoryModel;
 import base.api.model.user.UserModel;
-import base.api.repository.IUserRepository;
-import base.api.service.IUserService;
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")

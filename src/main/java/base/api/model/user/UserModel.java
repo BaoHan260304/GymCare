@@ -1,12 +1,9 @@
 package base.api.model.user;
 
 
-import base.api.enums.UserGender;
-import base.api.enums.UserRole;
 import base.api.model.BaseModel;
 import base.api.model.CategoryModel;
 import base.api.model.OrderModel;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;

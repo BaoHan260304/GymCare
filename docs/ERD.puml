@@ -1,0 +1,257 @@
+@startuml
+!theme plain
+hide circle
+skinparam linetype ortho
+
+' ---------- CORE USER & AUTHENTICATION ENTITIES ----------
+
+entity "Roles" as Roles {
+  *RoleID : INT <<PK>>
+  --
+  RoleName : NVARCHAR(50)
+}
+
+entity "Accounts" as Accounts {
+  *AccountID : INT <<PK>>
+  --
+  Email : NVARCHAR(100)
+  HashedPassword : NVARCHAR(255)
+  RoleID : INT <<FK>>
+  IsActive : BIT
+  CreatedAt : DATETIME
+  UpdatedAt : DATETIME
+}
+
+entity "Users" as Users {
+  *UserID : INT <<PK>>
+  --
+  AccountID : INT <<FK>>
+  FirstName : NVARCHAR(100)
+  LastName : NVARCHAR(100)
+  PhoneNumber : NVARCHAR(20)
+  DateOfBirth : DATE
+  Address : NVARCHAR(255)
+  EmergencyContactName : NVARCHAR(200)
+  EmergencyContactPhone : NVARCHAR(20)
+}
+
+entity "Staff" as Staff {
+  *StaffID : INT <<PK>>
+  --
+  UserID : INT <<FK>>
+  HireDate : DATE
+  JobTitle : NVARCHAR(100)
+  Salary : DECIMAL(12,2)
+}
+
+entity "Customers" as Customers {
+  *CustomerID : INT <<PK>>
+  --
+  UserID : INT <<FK>>
+  MembershipID : INT <<FK>>
+  JoinDate : DATE
+}
+
+entity "Memberships" as Memberships {
+  *MembershipID : INT <<PK>>
+  --
+  MembershipName : NVARCHAR(100)
+  Description : NVARCHAR(MAX)
+  Price : DECIMAL(12,2)
+  DurationInDays : INT
+  IsActive : BIT
+}
+
+' ---------- CLASS & SCHEDULING ENTITIES ----------
+
+entity "Classes" as Classes {
+  *ClassID : INT <<PK>>
+  --
+  ClassName : NVARCHAR(100)
+  Description : NVARCHAR(255)
+  MaxCapacity : INT
+}
+
+entity "Schedule" as Schedule {
+  *ScheduleID : INT <<PK>>
+  --
+  ClassID : INT <<FK>>
+  Trainer_StaffID : INT <<FK>>
+  StartTime : DATETIME
+  EndTime : DATETIME
+  Room : NVARCHAR(50)
+}
+
+entity "Bookings" as Bookings {
+  *BookingID : INT <<PK>>
+  --
+  CustomerID : INT <<FK>>
+  ScheduleID : INT <<FK>>
+  BookingTime : DATETIME
+  Status : NVARCHAR(50)
+}
+
+entity "Attendance" as Attendance {
+  *AttendanceID : INT <<PK>>
+  --
+  BookingID : INT <<FK>>
+  CheckInTime : DATETIME
+  Status : NVARCHAR(50)
+}
+
+' ---------- INVENTORY, ASSET & SALES ENTITIES ----------
+
+entity "Equipment" as Equipment {
+  *EquipmentID : INT <<PK>>
+  --
+  EquipmentName : NVARCHAR(100)
+  PurchaseDate : DATE
+  Location : NVARCHAR(100)
+  Condition : NVARCHAR(50)
+}
+
+entity "MaintenanceLog" as MaintenanceLog {
+  *LogID : INT <<PK>>
+  --
+  EquipmentID : INT <<FK>>
+  ServiceDate : DATE
+  Description : NVARCHAR(255)
+  Cost : DECIMAL(12,2)
+}
+
+entity "Products" as Products {
+  *ProductID : INT <<PK>>
+  --
+  ProductName : NVARCHAR(100)
+  CostPrice : DECIMAL(12,2)
+  SellingPrice : DECIMAL(12,2)
+}
+
+entity "Stock" as Stock {
+  *StockID : INT <<PK>>
+  --
+  ProductID : INT <<FK>>
+  QuantityOnHand : INT
+  ReorderLevel : INT
+}
+
+entity "SalesTransactions" as SalesTransactions {
+  *TransactionID : INT <<PK>>
+  --
+  CustomerID : INT <<FK>>
+  StaffID : INT <<FK>>
+  TransactionDate : DATETIME
+  TotalAmount : DECIMAL(12,2)
+}
+
+entity "SalesTransactionItems" as SalesTransactionItems {
+  *ItemID : INT <<PK>>
+  --
+  TransactionID : INT <<FK>>
+  ProductID : INT <<FK>>
+  Quantity : INT
+  UnitPrice : DECIMAL(12,2)
+}
+
+' ---------- WELLNESS HUB (TRACKING & PLANNING) ENTITIES ----------
+
+entity "HealthMetrics" as HealthMetrics {
+  *MetricID : INT <<PK>>
+  --
+  CustomerID : INT <<FK>>
+  LogDate : DATE
+  Weight : DECIMAL(5,2)
+  BodyFatPercentage : DECIMAL(5,2)
+  Notes : NVARCHAR(MAX)
+}
+
+entity "WorkoutPlans" as WorkoutPlans {
+  *PlanID : INT <<PK>>
+  --
+  Trainer_StaffID : INT <<FK>>
+  CustomerID : INT <<FK>>
+  PlanName : NVARCHAR(100)
+  StartDate : DATE
+  EndDate : DATE
+}
+
+entity "NutritionPlans" as NutritionPlans {
+  *NutritionPlanID : INT <<PK>>
+  --
+  Trainer_StaffID : INT <<FK>>
+  CustomerID : INT <<FK>>
+  PlanName : NVARCHAR(100)
+  StartDate : DATE
+  EndDate : DATE
+  DailyCaloriesGoal : INT
+  ProteinGramsGoal : INT
+  CarbsGramsGoal : INT
+  FatGramsGoal : INT
+}
+
+entity "WorkoutLogs" as WorkoutLogs {
+  *LogID : INT <<PK>>
+  --
+  CustomerID : INT <<FK>>
+  WorkoutPlanID : INT <<FK>>
+  LogDate : DATETIME
+  Notes : NVARCHAR(MAX)
+}
+
+entity "Exercises" as Exercises {
+  *ExerciseID : INT <<PK>>
+  --
+  ExerciseName : NVARCHAR(100)
+  Description : NVARCHAR(MAX)
+  MuscleGroup : NVARCHAR(100)
+}
+
+entity "LoggedExercises" as LoggedExercises {
+  *LoggedExerciseID : INT <<PK>>
+  --
+  WorkoutLogID : INT <<FK>>
+  ExerciseID : INT <<FK>>
+}
+
+entity "LoggedSets" as LoggedSets {
+  *SetID : INT <<PK>>
+  --
+  LoggedExerciseID : INT <<FK>>
+  SetNumber : INT
+  Reps : INT
+  Weight : DECIMAL(6,2)
+}
+
+' ----------------- RELATIONSHIPS ------------------
+
+Roles ||--o{ Accounts
+Accounts ||--|| Users
+Users ||--|| Staff
+Users ||--|| Customers
+Memberships ||--o{ Customers
+
+Staff ||--o{ Schedule
+Classes ||--o{ Schedule
+Schedule ||--o{ Bookings
+Customers ||--o{ Bookings
+Bookings ||--|| Attendance
+
+Equipment ||--o{ MaintenanceLog
+Products ||--|| Stock
+SalesTransactions ||--o{ SalesTransactionItems
+Products ||--o{ SalesTransactionItems
+Customers ||--o{ SalesTransactions
+Staff ||--o{ SalesTransactions
+
+Customers ||--o{ HealthMetrics
+Customers ||--o{ WorkoutPlans
+Staff ||--o{ WorkoutPlans
+Customers ||--o{ NutritionPlans
+Staff ||--o{ NutritionPlans
+Customers ||--o{ WorkoutLogs
+WorkoutPlans ||--o{ WorkoutLogs
+WorkoutLogs ||--o{ LoggedExercises
+Exercises ||--o{ LoggedExercises
+LoggedExercises ||--o{ LoggedSets
+
+@enduml

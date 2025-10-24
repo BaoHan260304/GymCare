@@ -1,13 +1,9 @@
 package base.api.config;
 
-import base.api.enums.UserGender;
-import base.api.enums.UserRole;
 import base.api.model.user.UserModel;
-import base.api.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
