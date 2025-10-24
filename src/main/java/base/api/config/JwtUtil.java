@@ -1,6 +1,5 @@
 package base.api.config;
 
-import base.api.model.user.UserModel;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
