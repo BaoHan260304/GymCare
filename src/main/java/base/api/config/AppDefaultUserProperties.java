@@ -11,7 +11,7 @@ import java.util.Map;
 @Data
 public class AppDefaultUserProperties {
 
-    private Map<String, DefaultUser> users;
+    private Map<String, DefaultUser> Map;
 
     @Data
     public static class DefaultUser {

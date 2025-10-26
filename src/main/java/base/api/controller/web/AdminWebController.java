@@ -1,17 +1,15 @@
 package base.api.controller.web;
 
 
-import base.api.model.Customer;
-import base.api.service.CustomerService;
+import base.api.model.User;
+import base.api.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -20,7 +18,7 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminWebController {
 
-    private final CustomerService customerService;
+    private final UserService userService;
 
     // trang chủ cho admin
     @GetMapping("/dashboard")
@@ -30,37 +28,37 @@ public class AdminWebController {
     }
 
     // trang quản lý người dùng
-    @GetMapping("/customers")
-    public String manageCustomers(Model model) {
-        List<Customer> customers = customerService.findAllCustomers();
-        model.addAttribute("customers", customers);
-        return "admin/customers"; // Renders src/main/resources/templates/admin/customers.html
+    @GetMapping("/users")
+    public String manageUsers(Model model) {
+        List<User> users = userService.findAllUsers();
+        model.addAttribute("users", users);
+        return "admin/users"; // Renders src/main/resources/templates/admin/users.html
     }
 
-    @GetMapping("/customers/edit/{id}")
-    public String showUpdateCustomerForm(@PathVariable("id") Long id, Model model) {
-        Customer customer = customerService.findCustomerById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid customer Id:" + id));
-        model.addAttribute("customer", customer);
-        return "admin/customer-edit"; // Renders src/main/resources/templates/admin/customer-edit.html
+    @GetMapping("/users/edit/{id}")
+    public String showUpdateUsersForm(@PathVariable("id") Long id, Model model) {
+        User user = userService.findUserById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        model.addAttribute("users", user);
+        return "admin/user-edit"; // Renders src/main/resources/templates/admin/user-edit.html
     }
 
-    @PostMapping("/customers/update/{id}")
-    public String updateCustomer(@PathVariable("id") Long id, @ModelAttribute("customer") Customer customer) {
+    @PostMapping("/users/update/{id}")
+    public String updateUser(@PathVariable("id") Long id, @ModelAttribute("users") User user) {
         // Chỉ cập nhật các trường cho phép, không cập nhật toàn bộ đối tượng để tránh lỗi bảo mật
-        customerService.updateCustomer(id, customer);
-        return "redirect:/admin/customers";
+        userService.updateUser(id, user);
+        return "redirect:/admin/users";
     }
 
-    @GetMapping("/customers/inactive/{id}")
-    public String deleteCustomer(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+    @GetMapping("/users/inactive/{id}")
+    public String deleteUser(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
-            customerService.inActiveCustomer(id);
+            userService.inActiveUser(id);
             redirectAttributes.addFlashAttribute("successMessage", "Customer has been marked as inactive.");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error: Could not find customer to inactive.");
         }
-        return "redirect:/admin/customers"; // Luôn chuyển hướng về trang danh sách
+        return "redirect:/admin/users"; // Luôn chuyển hướng về trang danh sách
     }
 
 

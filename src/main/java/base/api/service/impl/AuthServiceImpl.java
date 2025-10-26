@@ -2,9 +2,9 @@ package base.api.service.impl;
 
 import base.api.config.JwtUtil;
 import base.api.model.Account;
-import base.api.model.Customer;
+import base.api.model.User;
 import base.api.repository.AccountRepository;
-import base.api.repository.CustomerRepository;
+import base.api.repository.UserRepository;
 import base.api.security.CustomUserDetails;
 import base.api.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -30,30 +30,30 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public Customer registerCustomer(String name, String email, String password, String mobile, String birthday, String identityCard, String licenceNumber, String licenceDate) {
-        if (customerRepository.findByEmail(email).isPresent()) {
+    public User registerUser(String name, String email, String password, String mobile, String birthday, String identityCard, String licenceNumber, String licenceDate) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalStateException("Email already in use");
         }
 
         // 1. Create and save Account
         Account account = new Account();
         account.setAccountName(email); // Use email as account name
-        account.setRole("Customer");
+        account.setRole("CUSTOMER");
         Account savedAccount = accountRepository.save(account);
 
         // 2. Create and save Customer
-        Customer customer = new Customer();
-        customer.setCustomerName(name);
-        customer.setEmail(email);
-        customer.setPassword(passwordEncoder.encode(password));
-        customer.setMobile(mobile);
-        customer.setBirthday(LocalDate.parse(birthday));
-        customer.setIdentityCard(identityCard);
-        customer.setLicenceNumber(licenceNumber);
-        customer.setLicenceDate(LocalDate.parse(licenceDate));
-        customer.setAccount(savedAccount);
+        User user = new User();
+        user.setUserName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setMobile(mobile);
+        user.setBirthday(LocalDate.parse(birthday));
+        user.setIdentityCard(identityCard);
+        user.setLicenceNumber(licenceNumber);
+        user.setLicenceDate(LocalDate.parse(licenceDate));
+        user.setAccount(savedAccount);
 
-        return customerRepository.save(customer);
+        return userRepository.save(user);
     }
 
     @Override

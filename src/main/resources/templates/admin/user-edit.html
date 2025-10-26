@@ -8,10 +8,10 @@
 <body>
 <div class="container">
     <h1>Edit Customer</h1>
-    <form th:action="@{/admin/customers/update/{id}(id=${customer.id})}" th:object="${customer}" method="post">
+    <form th:action="@{/admin/users/update/{id}(id=${users.id})}" th:object="${users}" method="post">
 
-        <label for="customerName">Customer Name:</label>
-        <input type="text" id="customerName" th:field="*{customerName}" required>
+        <label for="userName">Customer Name:</label>
+        <input type="text" id="userName" th:field="*{userName}" required>
 
         <label for="mobile">Mobile:</label>
         <input type="text" id="mobile" th:field="*{mobile}" required>
@@ -32,7 +32,7 @@
         <input type="date" id="licenceDate" th:field="*{licenceDate}" required>
 
         <button type="submit">Update Customer</button>
-        <a th:href="@{/admin/customers}" class="button-secondary">Cancel</a>
+        <a th:href="@{/admin/users}" class="button-secondary">Cancel</a>
     </form>
 </div>
 </body>

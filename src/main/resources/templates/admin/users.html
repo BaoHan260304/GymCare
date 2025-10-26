@@ -23,15 +23,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="customer : ${customers}">
-                    <td th:text="${customer.id}"></td>
-                    <td th:text="${customer.customerName}"></td>
-                    <td th:text="${customer.email}"></td>
-                    <td th:text="${customer.mobile}"></td>
-                    <td th:text="${customer.account.role}"></td>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.userName}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.mobile}"></td>
+                    <td th:text="${user.account.role}"></td>
                     <td>
-                        <a th:href="@{/admin/customers/edit/{id}(id=${customer.id})}"class="button-edit">Edit</a>
-                        <a th:href="@{/admin/customers/delete/{id}(id=${customer.id})}" class="button-delete" onclick="return confirm('Are you sure you want to inactive this customer?');">Inactive</a>
+                        <a th:href="@{/admin/users/edit/{id}(id=${user.id})}"class="button-edit">Edit</a>
+                        <a th:href="@{/admin/users/inactive/{id}(id=${user.id})}" class="button-inactive" onclick="return confirm('Are you sure you want to inactive this customer?');">Inactive</a>
                     </td>
                 </tr>
             </tbody>

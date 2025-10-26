@@ -2,7 +2,7 @@ package base.api.controller;
 
 import base.api.dto.request.LoginRequest;
 import base.api.dto.request.RegisterRequest;
-import base.api.model.Customer;
+import base.api.model.User;
 import base.api.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ public class AuthController { // Renamed from AuthController to AuthController
     @PostMapping("/register")
     public ResponseEntity<?> registerCustomer(@RequestBody RegisterRequest request) {
         try {
-            Customer registeredCustomer = authService.registerCustomer(
+            User registeredCustomer = authService.registerUser(
                     request.getName(),
                     request.getEmail(),
                     request.getPassword(),

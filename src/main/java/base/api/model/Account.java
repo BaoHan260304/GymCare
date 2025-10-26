@@ -22,5 +22,5 @@ public class Account extends BaseModel {
     private String role; // Ví dụ: "Admin", "Customer"
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
-    private Customer customer;
+    private User user;
 }

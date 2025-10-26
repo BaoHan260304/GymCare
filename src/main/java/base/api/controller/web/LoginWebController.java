@@ -33,7 +33,7 @@ public class LoginWebController {
     @PostMapping("/register")
     public String registerSubmit(@ModelAttribute RegisterRequest registerRequest, Model model) {
         try {
-            authService.registerCustomer(
+            authService.registerUser(
                     registerRequest.getName(),
                     registerRequest.getEmail(),
                     registerRequest.getPassword(),

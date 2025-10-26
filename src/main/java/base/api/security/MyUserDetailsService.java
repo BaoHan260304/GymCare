@@ -1,9 +1,9 @@
 package base.api.security;
 
 import base.api.model.Account;
-import base.api.model.Customer;
+import base.api.model.User;
 import base.api.repository.AccountRepository;
-import base.api.repository.CustomerRepository;
+import base.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +18,7 @@ import java.util.Optional;
 public class MyUserDetailsService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
-    private final CustomerRepository customerRepository; // To get the password
+    private final UserRepository userRepository; // To get the password
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -27,19 +27,19 @@ public class MyUserDetailsService implements UserDetailsService {
 
         // We need the password from the Customer entity linked to this account
         // Assuming AccountName is the email for Customer accounts
-        Optional<Customer> customerOptional = customerRepository.findByEmail(email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if (customerOptional.isEmpty()) {
+        if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("Customer details not found for account: " + email);
         }
 
-        Customer customer = customerOptional.get();
+        User user = userOptional.get();
 
         // KIỂM TRA TRẠNG THÁI KHÔNG HOẠT ĐỘNG
-        if (customer.isInactive()) {
+        if (user.isInactive()) {
             throw new DisabledException("User account has been disabled.");
         }
 
-        return new CustomUserDetails(account, customer.getPassword());
+        return new CustomUserDetails(account, user.getPassword());
     }
 }

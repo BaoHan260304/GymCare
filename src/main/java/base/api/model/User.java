@@ -1,6 +1,5 @@
 package base.api.model;
 
-import base.api.model.BaseModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "customer")
-@AttributeOverride(name = "id", column = @Column(name = "customer_id"))
-public class Customer extends BaseModel {
+@Table(name = "users")
+@AttributeOverride(name = "id", column = @Column(name = "user_id"))
+public class User extends BaseModel {
 
-    @Column(name = "customer_name", nullable = false)
-    private String customerName;
+    @Column(name = "user_name", nullable = false)
+    private String userName;
 
     @Column(nullable = false)
     private String mobile;
