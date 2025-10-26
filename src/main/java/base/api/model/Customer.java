@@ -1,33 +1,48 @@
 package base.api.model;
 
+import base.api.model.BaseModel;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.LocalDate;
-
-@Entity
-@Table(name = "Customers")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-public class Customer {
+@AllArgsConstructor
+@Entity
+@Table(name = "customer")
+@AttributeOverride(name = "id", column = @Column(name = "customer_id"))
+public class Customer extends BaseModel {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CustomerID")
-    private Integer customerId;
+    @Column(name = "customer_name", nullable = false)
+    private String customerName;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "UserID", nullable = false, unique = true)
-    private User user;
+    @Column(nullable = false)
+    private String mobile;
 
-    // Tạm thời để null, sẽ cập nhật khi có module Membership
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MembershipID")
-    private Membership membership;
+    @Column(nullable = false)
+    private java.time.LocalDate birthday;
 
-    @Column(name = "JoinDate", nullable = false)
-    private LocalDate joinDate;
+    @Column(name = "identity_card", nullable = false)
+    private String identityCard;
+
+    @Column(name = "licence_number", nullable = false)
+    private String licenceNumber;
+
+    @Column(name = "licence_date", nullable = false)
+    private java.time.LocalDate licenceDate;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(name = "inactive", nullable = false, columnDefinition = "bit default 0")
+    private boolean inactive = false;
+
+
+    @OneToOne
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 }

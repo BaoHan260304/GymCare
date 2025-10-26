@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Customer Dashboard</h1>
+        <p>Welcome, <span sec:authentication="name">Customer</span>!</p>
+
+        // điều hướng tới controller rồi phát triển thêm chức năng
+        <nav>
+            <ul>
+                <li><a th:href="@{/customer/...}">View ... </a></li>
+                <li><a th:href="@{/customer/...}">...</a></li>
+            </ul>
+        </nav>
+        <form th:action="@{/perform_logout}" method="post"><button type="submit">Logout</button></form>
+    </div>
+</body>
+</html>

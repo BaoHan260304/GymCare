@@ -1,18 +1,13 @@
 package base.api.base;
 
 import base.api.config.JwtUtil;
-import base.api.dto.request.paging.PageResponseDTO;
+import base.api.dto.request.PageResponseDTO;
 import base.api.dto.response.TFUResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public abstract class BaseAPIController {
 

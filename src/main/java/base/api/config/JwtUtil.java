@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import base.api.security.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -21,13 +22,13 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(UserModel userModel) {
+    public String generateToken(CustomUserDetails userDetails) {
         return Jwts.builder()
-                .setSubject(userModel.getUserName())
-                .claim("email", userModel.getEmail())
-                .claim("user_name", userModel.getUserName())
-                .claim("role", userModel.getRole().name())
-                .claim("id", userModel.getId())
+                .setSubject(userDetails.getUsername()) // This is email
+                .claim("email", userDetails.getUsername())
+                .claim("user_name", userDetails.getUsername()) // Assuming username is email
+                .claim("role", userDetails.getRole())
+                .claim("id", userDetails.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 100))
                 .signWith(key, SignatureAlgorithm.HS256)

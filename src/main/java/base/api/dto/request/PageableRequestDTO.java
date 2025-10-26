@@ -1,4 +1,4 @@
-package base.api.dto.request.paging;
+package base.api.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

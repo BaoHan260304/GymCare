@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Lý Gói Tập</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Thêm style cho bảng */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        .actions a { margin-right: 10px; }
+    </style>
+</head>
+<body>
+<div class="container" style="max-width: 960px;">
+    <h2>Danh Sách Gói Tập</h2>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <a th:href="@{/manager/memberships/new}" class="btn">Tạo Gói Tập Mới</a>
+
+    <table th:if="${!memberships.isEmpty()}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên Gói Tập</th>
+            <th>Giá</th>
+            <th>Thời hạn (ngày)</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="mem : ${memberships}">
+            <td th:text="${mem.id}"></td>
+            <td th:text="${mem.membershipName}"></td>
+            <td th:text="${#numbers.formatDecimal(mem.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+            <td th:text="${mem.durationInDays}"></td>
+            <td th:text="${mem.isActive ? 'Kích hoạt' : 'Vô hiệu hóa'}"></td>
+            <td class="actions">
+                <a th:href="@{'/manager/memberships/edit/' + ${mem.id}}">Sửa</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${memberships.isEmpty()}" style="margin-top: 20px;">
+        <p>Chưa có gói tập nào được tạo.</p>
+    </div>
+</div>
+</body>
+</html>

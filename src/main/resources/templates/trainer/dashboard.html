@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Trainer Dashboard</h1>
+    <p>Welcome, <span sec:authentication="name">Trainer</span>!</p>
+
+    <nav>
+        <ul>
+            <li><a th:href="@{/trainer/...}">View ...</a></li>
+            <li><a th:href="@{/trainer/...}">...</a></li>
+        </ul>
+    </nav>
+    <form th:action="@{/perform_logout}" method="post"><button type="submit">Logout</button></form>
+</div>
+</body>
+</html>

@@ -1,23 +1,21 @@
 package base.api.controller.web;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.security.Principal;
 
 @Controller
 public class HomeController {
 
     @GetMapping("/")
-    public String home() {
-        return "index"; // Trả về file /resources/templates/index.html
-    }
-
-    @GetMapping("/login")
-    public String loginPage() {
-        return "login"; // Trả về file /resources/templates/login.html
-    }
-
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "dashboard"; // Trang dashboard sau khi đăng nhập
+    public String index(Model model, Principal principal) {
+        if (principal != null) {
+            model.addAttribute("username", principal.getName());
+        } else {
+            model.addAttribute("username", "Guest");
+        }
+        return "index"; // Renders src/main/resources/templates/index.html
     }
 }

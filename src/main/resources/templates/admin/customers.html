@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Customers</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Customers</h1>
+        <a th:href="@{/admin/dashboard}">Back to Dashboard</a>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="customer : ${customers}">
+                    <td th:text="${customer.id}"></td>
+                    <td th:text="${customer.customerName}"></td>
+                    <td th:text="${customer.email}"></td>
+                    <td th:text="${customer.mobile}"></td>
+                    <td th:text="${customer.account.role}"></td>
+                    <td>
+                        <a th:href="@{/admin/customers/edit/{id}(id=${customer.id})}"class="button-edit">Edit</a>
+                        <a th:href="@{/admin/customers/delete/{id}(id=${customer.id})}" class="button-delete" onclick="return confirm('Are you sure you want to inactive this customer?');">Inactive</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

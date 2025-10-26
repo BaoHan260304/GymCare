@@ -1,46 +1,26 @@
 package base.api.model;
 
+import base.api.model.BaseModel;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Entity
-@Table(name = "Accounts")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+@Entity
+@Table(name = "account")
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "AccountID")
-    private Integer accountId;
+@AttributeOverride(name = "id", column = @Column(name = "account_id"))
+public class Account extends BaseModel {
 
-    @Column(name = "Email", nullable = false, length = 100, unique = true)
-    private String email;
+    @Column(name = "account_name", nullable = false, unique = true)
+    private String accountName;
 
-    @Column(name = "HashedPassword", nullable = false, length = 255)
-    private String hashedPassword;
+    @Column(nullable = false)
+    private String role; // Ví dụ: "Admin", "Customer"
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RoleID", nullable = false)
-    private Role role;
-
-    @Column(name = "IsActive", nullable = false)
-    private Boolean isActive = true;
-
-    @CreationTimestamp
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UpdatedAt", nullable = false)
-    private LocalDateTime updatedAt;
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    private Customer customer;
 }
