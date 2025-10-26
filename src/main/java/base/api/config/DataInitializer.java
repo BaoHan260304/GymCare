@@ -5,13 +5,13 @@ import base.api.model.Customer;
 import base.api.repository.AccountRepository;
 import base.api.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -22,116 +22,79 @@ public class DataInitializer implements CommandLineRunner {
     private final AccountRepository accountRepository;
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
-
-    // ----ADMIN DEFAULT ACCOUNT----
-    @Value("${app.default-users.admin.name}")
-    private String adminName;
-    @Value("${app.default-users.admin.email}")
-    private String adminEmail;
-    @Value("${app.default-users.admin.password}")
-    private String adminPassword;
-    @Value("${app.default-users.admin.mobile}")
-    private String adminMobile;
-    @Value("${app.default-users.admin.birthday}")
-    private String adminBirthday;
-    @Value("${app.default-users.admin.identitycard}")
-    private String adminIdentityCard;
-    @Value("${app.default-users.admin.licencenumber}")
-    private String adminLicenceNumber;
-    @Value("${app.default-users.admin.licencedate}")
-    private String adminLicenceDate;
-
-    // ----MANAGER DEFAULT ACCOUNT----
-    @Value("${app.default-users.manager.name}")
-    private String managerName;
-    @Value("${app.default-users.manager.email}")
-    private String managerEmail;
-    @Value("${app.default-users.manager.password}")
-    private String managerPassword;
-    @Value("${app.default-users.manager.mobile}")
-    private String managerMobile;
-    @Value("${app.default-users.manager.birthday}")
-    private String managerBirthday;
-    @Value("${app.default-users.manager.identitycard}")
-    private String managerIdentityCard;
-    @Value("${app.default-users.manager.licencenumber}")
-    private String managerLicenceNumber;
-    @Value("${app.default-users.manager.licencedate}")
-    private String managerLicenceDate;
-
-    // ----INVENTORY DEFAULT ACCOUNT----
-    @Value("${app.default-users.inventory.name}")
-    private String inventoryName;
-    @Value("${app.default-users.inventory.email}")
-    private String inventoryEmail;
-    @Value("${app.default-users.inventory.password}")
-    private String inventoryPassword;
-    @Value("${app.default-users.inventory.mobile}")
-    private String inventoryMobile;
-    @Value("${app.default-users.inventory.birthday}")
-    private String inventoryBirthday;
-    @Value("${app.default-users.inventory.identitycard}")
-    private String inventoryIdentityCard;
-    @Value("${app.default-users.inventory.licencenumber}")
-    private String inventoryLicenceNumber;
-    @Value("${app.default-users.inventory.licencedate}")
-    private String inventoryLicenceDate;
-
+    private final AppDefaultUserProperties appDefaultUserProperties;
 
     @Override
     public void run(String... args) {
-        createIfNotExists(adminName, adminEmail, adminPassword, adminMobile, adminBirthday, adminIdentityCard, adminLicenceNumber, adminLicenceDate, "ADMIN");
-        createIfNotExists(managerName, managerEmail, managerPassword, managerMobile, managerBirthday, managerIdentityCard, managerLicenceNumber, managerLicenceDate,"MANAGER");
-        createIfNotExists(inventoryName, inventoryEmail, inventoryPassword, inventoryMobile, inventoryBirthday, inventoryIdentityCard, inventoryLicenceNumber, inventoryLicenceDate, "INVENTORY");
+        Map<String, AppDefaultUserProperties.DefaultUser> users = appDefaultUserProperties.getUsers();
+
+        users.forEach((roleKey, user) -> {
+            String role = roleKey.toUpperCase(); // admin → ADMIN
+            createUserIfNotExists(role, user);
+        });
     }
 
-    private void createIfNotExists(
-            String name,
-            String email,
-            String defaultPassword,
-            String mobile,
-            String birthday,
-            String identityCard,
-            String licenceNumber,
-            String licenceDate,
-            String role) {
-        Optional<Customer> existingAccountOpt = customerRepository.findByEmail(email);
+    private void createUserIfNotExists(String role, AppDefaultUserProperties.DefaultUser user) {
+        Optional<Customer> existingOpt = customerRepository.findByEmail(user.getEmail());
 
-        // Nếu chưa có tài khoản thì tạo mới
-        if (existingAccountOpt.isEmpty()) {
-            // Tạo Account trước
+        if (existingOpt.isEmpty()) {
             Account account = new Account();
-            account.setAccountName(email);
+            account.setAccountName(user.getEmail());
             account.setRole(role);
             Account savedAccount = accountRepository.save(account);
 
-            // Tạo Customer tương ứng
             Customer customer = new Customer();
-            customer.setCustomerName(name);
-            customer.setEmail(email);
-            customer.setPassword(passwordEncoder.encode(defaultPassword));
-            customer.setMobile(mobile);
-            customer.setBirthday(LocalDate.parse(birthday));  //or customer.setBirthday(LocalDate.of(2004, 3, 26));
-            customer.setIdentityCard(identityCard);
-            customer.setLicenceNumber(licenceNumber);
-            customer.setLicenceDate(LocalDate.parse(licenceDate));  //or customer.setLicenceDate(LocalDate.now());
+            customer.setCustomerName(user.getName());
+            customer.setEmail(user.getEmail());
+            customer.setPassword(passwordEncoder.encode(user.getPassword()));
+            customer.setMobile(user.getMobile() != null ? user.getMobile() : "0123456789");
+            customer.setBirthday(parseDate(user.getBirthday(), LocalDate.of(1990, 1, 1)));
+            customer.setIdentityCard(user.getIdentitycard() != null ? user.getIdentitycard() : "000000000");
+            customer.setLicenceNumber(user.getLicencenumber() != null ? user.getLicencenumber() : "LC000000");
+            customer.setLicenceDate(parseDate(user.getLicencedate(), LocalDate.now()));
             customer.setAccount(savedAccount);
 
             customerRepository.save(customer);
-            System.out.println("Default " + role + " created: " + email);
+            System.out.println("Created " + role + " user: " + user.getEmail());
         } else {
-            Customer existingAccount = existingAccountOpt.get();
+            Customer existing = existingOpt.get();
+            boolean updated = false;
 
-            // Kiểm tra bằng passwordEncoder.matches (so sánh mật khẩu plain với hash stored)
-            if (!passwordEncoder.matches(defaultPassword, existingAccount.getPassword())) {
-                existingAccount.setPassword(passwordEncoder.encode(defaultPassword));
-                customerRepository.save(existingAccount);
-                System.out.println(" Password updated for: " + email);
+            if (!passwordEncoder.matches(user.getPassword(), existing.getPassword())) {
+                existing.setPassword(passwordEncoder.encode(user.getPassword()));
+                updated = true;
+            }
+
+            if (!existing.getCustomerName().equals(user.getName())) {
+                existing.setCustomerName(user.getName());
+                updated = true;
+            }
+
+            if (user.getMobile() != null && !user.getMobile().equals(existing.getMobile())) {
+                existing.setMobile(user.getMobile());
+                updated = true;
+            }
+
+            if (user.getBirthday() != null && !user.getBirthday().equals(existing.getBirthday().toString())) {
+                existing.setBirthday(LocalDate.parse(user.getBirthday()));
+                updated = true;
+            }
+
+            if (updated) {
+                customerRepository.save(existing);
+                System.out.println("Updated info for: " + user.getEmail());
             } else {
-                System.out.println("Default accounts already exists with correct password, skip update.");
+                System.out.println(role + " already exists, no changes.");
             }
         }
+
     }
 
-
+    private LocalDate parseDate(String dateStr, LocalDate defaultDate) {
+        try {
+            return (dateStr != null && !dateStr.isBlank()) ? LocalDate.parse(dateStr) : defaultDate;
+        } catch (Exception e) {
+            return defaultDate;
+        }
+    }
 }
