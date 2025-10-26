@@ -23,47 +23,115 @@ public class DataInitializer implements CommandLineRunner {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.admin.default-password:123123}") // nếu không có thì mặc định l 123123
-    private String defaultAdminPassword; // injected từ properties, fallback "123123"
+    // ----ADMIN DEFAULT ACCOUNT----
+    @Value("${app.default-users.admin.name}")
+    private String adminName;
+    @Value("${app.default-users.admin.email}")
+    private String adminEmail;
+    @Value("${app.default-users.admin.password}")
+    private String adminPassword;
+    @Value("${app.default-users.admin.mobile}")
+    private String adminMobile;
+    @Value("${app.default-users.admin.birthday}")
+    private String adminBirthday;
+    @Value("${app.default-users.admin.identitycard}")
+    private String adminIdentityCard;
+    @Value("${app.default-users.admin.licencenumber}")
+    private String adminLicenceNumber;
+    @Value("${app.default-users.admin.licencedate}")
+    private String adminLicenceDate;
+
+    // ----MANAGER DEFAULT ACCOUNT----
+    @Value("${app.default-users.manager.name}")
+    private String managerName;
+    @Value("${app.default-users.manager.email}")
+    private String managerEmail;
+    @Value("${app.default-users.manager.password}")
+    private String managerPassword;
+    @Value("${app.default-users.manager.mobile}")
+    private String managerMobile;
+    @Value("${app.default-users.manager.birthday}")
+    private String managerBirthday;
+    @Value("${app.default-users.manager.identitycard}")
+    private String managerIdentityCard;
+    @Value("${app.default-users.manager.licencenumber}")
+    private String managerLicenceNumber;
+    @Value("${app.default-users.manager.licencedate}")
+    private String managerLicenceDate;
+
+    // ----INVENTORY DEFAULT ACCOUNT----
+    @Value("${app.default-users.inventory.name}")
+    private String inventoryName;
+    @Value("${app.default-users.inventory.email}")
+    private String inventoryEmail;
+    @Value("${app.default-users.inventory.password}")
+    private String inventoryPassword;
+    @Value("${app.default-users.inventory.mobile}")
+    private String inventoryMobile;
+    @Value("${app.default-users.inventory.birthday}")
+    private String inventoryBirthday;
+    @Value("${app.default-users.inventory.identitycard}")
+    private String inventoryIdentityCard;
+    @Value("${app.default-users.inventory.licencenumber}")
+    private String inventoryLicenceNumber;
+    @Value("${app.default-users.inventory.licencedate}")
+    private String inventoryLicenceDate;
+
 
     @Override
     public void run(String... args) {
-        String adminEmail = "admin@gmail.com";
-        Optional<Customer> existingAdminOpt = customerRepository.findByEmail(adminEmail);
+        createIfNotExists(adminName, adminEmail, adminPassword, adminMobile, adminBirthday, adminIdentityCard, adminLicenceNumber, adminLicenceDate, "ADMIN");
+        createIfNotExists(managerName, managerEmail, managerPassword, managerMobile, managerBirthday, managerIdentityCard, managerLicenceNumber, managerLicenceDate,"MANAGER");
+        createIfNotExists(inventoryName, inventoryEmail, inventoryPassword, inventoryMobile, inventoryBirthday, inventoryIdentityCard, inventoryLicenceNumber, inventoryLicenceDate, "INVENTORY");
+    }
 
-        // Nếu chưa có admin thì tạo mới
-        if (existingAdminOpt.isEmpty()) {
+    private void createIfNotExists(
+            String name,
+            String email,
+            String defaultPassword,
+            String mobile,
+            String birthday,
+            String identityCard,
+            String licenceNumber,
+            String licenceDate,
+            String role) {
+        Optional<Customer> existingAccountOpt = customerRepository.findByEmail(email);
+
+        // Nếu chưa có tài khoản thì tạo mới
+        if (existingAccountOpt.isEmpty()) {
             // Tạo Account trước
             Account account = new Account();
-            account.setAccountName(adminEmail);
-            account.setRole("ADMIN");
+            account.setAccountName(email);
+            account.setRole(role);
             Account savedAccount = accountRepository.save(account);
 
             // Tạo Customer tương ứng
-            Customer admin = new Customer();
-            admin.setCustomerName("System Admin");
-            admin.setEmail(adminEmail);
-            admin.setPassword(passwordEncoder.encode(defaultAdminPassword));
-            admin.setMobile("0123456789");
-            admin.setBirthday(LocalDate.of(1990, 1, 1));
-            admin.setIdentityCard("000000001");
-            admin.setLicenceNumber("AD123456");
-            admin.setLicenceDate(LocalDate.now());
-            admin.setAccount(savedAccount);
+            Customer customer = new Customer();
+            customer.setCustomerName(name);
+            customer.setEmail(email);
+            customer.setPassword(passwordEncoder.encode(defaultPassword));
+            customer.setMobile(mobile);
+            customer.setBirthday(LocalDate.parse(birthday));  //or customer.setBirthday(LocalDate.of(2004, 3, 26));
+            customer.setIdentityCard(identityCard);
+            customer.setLicenceNumber(licenceNumber);
+            customer.setLicenceDate(LocalDate.parse(licenceDate));  //or customer.setLicenceDate(LocalDate.now());
+            customer.setAccount(savedAccount);
 
-            customerRepository.save(admin);
-
-            System.out.println("Default admin created: " + adminEmail);
+            customerRepository.save(customer);
+            System.out.println("Default " + role + " created: " + email);
         } else {
-            Customer existingAdmin = existingAdminOpt.get();
+            Customer existingAccount = existingAccountOpt.get();
+
             // Kiểm tra bằng passwordEncoder.matches (so sánh mật khẩu plain với hash stored)
-            if (!passwordEncoder.matches(defaultAdminPassword, existingAdmin.getPassword())) {
-                existingAdmin.setPassword(passwordEncoder.encode(defaultAdminPassword));
-                customerRepository.save(existingAdmin);
-                System.out.println(" Admin password updated for: " + adminEmail);
+            if (!passwordEncoder.matches(defaultPassword, existingAccount.getPassword())) {
+                existingAccount.setPassword(passwordEncoder.encode(defaultPassword));
+                customerRepository.save(existingAccount);
+                System.out.println(" Password updated for: " + email);
             } else {
-                System.out.println("Admin already exists with correct password, skip update.");
+                System.out.println("Default accounts already exists with correct password, skip update.");
             }
         }
     }
+
+
 }
