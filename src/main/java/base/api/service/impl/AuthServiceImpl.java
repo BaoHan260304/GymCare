@@ -1,6 +1,7 @@
 package base.api.service.impl;
 
 import base.api.config.JwtUtil;
+import base.api.dto.request.CustomerRegistrationRequest;
 import base.api.model.Account;
 import base.api.model.User;
 import base.api.repository.AccountRepository;
@@ -30,27 +31,26 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public User registerUser(String name, String email, String password, String mobile, String birthday, String identityCard, String licenceNumber, String licenceDate) {
-        if (userRepository.findByEmail(email).isPresent()) {
+    public User registerUser(CustomerRegistrationRequest request) {
+        if (accountRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalStateException("Email already in use");
         }
 
         // 1. Create and save Account
         Account account = new Account();
-        account.setAccountName(email); // Use email as account name
+        account.setAccountName(request.getEmail()); // Use email as account name
+        account.setEmail(request.getEmail());
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
         account.setRole("CUSTOMER");
         Account savedAccount = accountRepository.save(account);
 
         // 2. Create and save Customer
         User user = new User();
-        user.setUserName(name);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setMobile(mobile);
-        user.setBirthday(LocalDate.parse(birthday));
-        user.setIdentityCard(identityCard);
-        user.setLicenceNumber(licenceNumber);
-        user.setLicenceDate(LocalDate.parse(licenceDate));
+        user.setUserName(request.getUserName());
+        user.setMobile(request.getMobile());
+        user.setBirthday(LocalDate.parse(request.getBirthday()));
+        user.setIdentityCard(request.getIdentityCard());
+        // licenceNumber and licenceDate are intentionally left null for customers
         user.setAccount(savedAccount);
 
         return userRepository.save(user);

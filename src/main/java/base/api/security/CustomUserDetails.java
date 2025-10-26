@@ -12,50 +12,48 @@ import java.util.Collections;
 @Getter
 public class CustomUserDetails implements UserDetails {
 
-    private Long id;
-    private String username; // This will be the email
-    private String password;
-    private String role;
+    private final Account account;
 
-    public CustomUserDetails(Account account, String password) {
-        this.id = account.getId();
-        this.username = account.getAccountName(); // Email
-        this.password = password; // The encoded password from the database
-        this.role = account.getRole();
+    public CustomUserDetails(Account account) {
+        this.account = account;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+        // The "ROLE_" prefix is a standard convention in Spring Security.
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + account.getRole().toUpperCase()));
     }
 
     @Override
     public String getPassword() {
-        return password;
+        // Delegate directly to the account entity
+        return account.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        // The username for authentication is the email
+        return account.getEmail();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return true; // in updating
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return true; // in updating
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return true; // in updating
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        // Delegate directly to the account's isActive status
+        return account.isActive();
     }
 }

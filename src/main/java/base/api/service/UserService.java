@@ -8,9 +8,12 @@ import java.util.Optional;
 public interface UserService {
     List<User> findAllUsers();
 
+    List<User> findAllByRole(String role);
+
     Optional<User> findUserById(Long id);
 
-    User updateUser(Long id, User customerDetails);
+    User updateUser(Long id, User userDetails);
 
     void inActiveUser(Long id);
+
 }

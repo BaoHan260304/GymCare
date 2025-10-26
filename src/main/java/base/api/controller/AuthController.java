@@ -1,7 +1,7 @@
 package base.api.controller;
 
 import base.api.dto.request.LoginRequest;
-import base.api.dto.request.RegisterRequest;
+import base.api.dto.request.CustomerRegistrationRequest;
 import base.api.model.User;
 import base.api.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -25,19 +25,11 @@ public class AuthController { // Renamed from AuthController to AuthController
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCustomer(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> registerCustomer(@RequestBody CustomerRegistrationRequest request) {
         try {
-            User registeredCustomer = authService.registerUser(
-                    request.getName(),
-                    request.getEmail(),
-                    request.getPassword(),
-                    request.getMobile(),
-                    request.getBirthday().toString(), // Convert LocalDate to String for service method
-                    request.getIdentityCard(),
-                    request.getLicenceNumber(),
-                    request.getLicenceDate().toString() // Convert LocalDate to String for service method
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body("Customer registered successfully with ID: " + registeredCustomer.getId());
+            // Call the refactored service method with the correct DTO
+            User registeredUser = authService.registerUser(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Customer registered successfully with ID: " + registeredUser.getId());
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {

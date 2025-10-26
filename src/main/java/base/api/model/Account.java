@@ -18,8 +18,17 @@ public class Account extends BaseModel {
     @Column(name = "account_name", nullable = false, unique = true)
     private String accountName;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
     @Column(nullable = false)
     private String role; // Ví dụ: "Admin", "Customer"
+
+    @Column(name = "is_active", nullable = false, columnDefinition = "bit default 1")
+    private boolean isActive = true;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     private User user;

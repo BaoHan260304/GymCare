@@ -1,23 +1,32 @@
 package base.api.service.impl;
 
+import base.api.model.Account;
 import base.api.model.User;
+import base.api.repository.AccountRepository;
 import base.api.repository.UserRepository;
 import base.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final AccountRepository accountRepository; // Inject AccountRepository
 
     @Override
     public List<User> findAllUsers() {
-        return userRepository.findByInactiveFalse();
+        // Find all accounts that are active, then get the associated users.
+        return accountRepository.findByIsActive(true)
+                .stream()
+                .map(Account::getUser)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -25,24 +34,40 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id);
     }
 
+    @Transactional
     @Override
-    public User updateUser(Long id, User customerDetails) {
-        User customer = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
+    public User updateUser(Long id, User userDetails) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        customer.setUserName(customerDetails.getUserName());
-        customer.setMobile(customerDetails.getMobile());
-        // Update other fields as needed, but be careful with sensitive data like password or email
+        // Update only the allowed fields from the request
+        user.setUserName(userDetails.getUserName());
+        user.setMobile(userDetails.getMobile());
+        user.setBirthday(userDetails.getBirthday());
+        user.setIdentityCard(userDetails.getIdentityCard());
 
-        return userRepository.save(customer);
+        return userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public void inActiveUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
-        // Đánh dấu khách hàng là không hoạt động (inactive)
-        user.setInactive(true);
-        userRepository.save(user);
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        // Get the associated account and set it to inactive
+        Account account = user.getAccount();
+        if (account != null) {
+            account.setActive(false);
+            accountRepository.save(account);
+        }
+    }
+
+    @Override
+    public List<User> findAllByRole(String role) {
+        return accountRepository.findByRole(role)
+                .stream()
+                .map(Account::getUser)
+                .collect(Collectors.toList());
     }
 }

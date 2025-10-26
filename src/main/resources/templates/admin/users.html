@@ -7,35 +7,41 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-    <div class="container">
-        <h1>Manage Customers</h1>
-        <a th:href="@{/admin/dashboard}">Back to Dashboard</a>
+<div class="container">
+    <h1>Manage Customers</h1>
+    <a th:href="@{/admin/dashboard}">Back to Dashboard</a>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Mobile</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="user : ${users}">
-                    <td th:text="${user.id}"></td>
-                    <td th:text="${user.userName}"></td>
-                    <td th:text="${user.email}"></td>
-                    <td th:text="${user.mobile}"></td>
-                    <td th:text="${user.account.role}"></td>
-                    <td>
-                        <a th:href="@{/admin/users/edit/{id}(id=${user.id})}"class="button-edit">Edit</a>
-                        <a th:href="@{/admin/users/inactive/{id}(id=${user.id})}" class="button-inactive" onclick="return confirm('Are you sure you want to inactive this customer?');">Inactive</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.userName}"></td>
+            <td th:text="${user.mobile}"></td>
+            <td th:text="${user.account.role}"></td>
+            <td>
+                 <span th:class="${user.account.isActive} ? 'status-active' : 'status-inactive'"
+                       th:text="${user.account.isActive} ? 'Active' : 'Inactive'"></span>
+            </td>
+            <td>
+                <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="button-edit">Edit</a>
+                <a th:if="${user.account.isActive}"
+                   th:href="@{/admin/users/inactive/{id}(id=${user.id})}"
+                   onclick="return confirm('Are you sure you want to inactive this customer?')"
+                   class="action-link-danger">Inactive</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 package base.api.controller.web;
 
-import base.api.dto.request.RegisterRequest;
+import base.api.dto.request.CustomerRegistrationRequest;
 import base.api.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -26,25 +26,19 @@ public class LoginWebController {
 
     @GetMapping("/register")
     public String registerForm(Model model) {
-        model.addAttribute("registerRequest", new RegisterRequest());
+        // Use the specific DTO for customer registration
+        model.addAttribute("customerRequest", new CustomerRegistrationRequest());
         return "config/register"; // Renders src/main/resources/templates/register.html
     }
 
     @PostMapping("/register")
-    public String registerSubmit(@ModelAttribute RegisterRequest registerRequest, Model model) {
+    public String registerSubmit(@ModelAttribute("customerRequest") CustomerRegistrationRequest customerRequest, Model model) {
         try {
-            authService.registerUser(
-                    registerRequest.getName(),
-                    registerRequest.getEmail(),
-                    registerRequest.getPassword(),
-                    registerRequest.getMobile(),
-                    registerRequest.getBirthday().toString(),
-                    registerRequest.getIdentityCard(),
-                    registerRequest.getLicenceNumber(),
-                    registerRequest.getLicenceDate().toString()
-            );
+            // Call the updated service method that accepts the DTO
+            authService.registerUser(customerRequest);
             return "redirect:/login?registered=true"; // Redirect to login page with success message
         } catch (IllegalStateException e) {
+            // If email is already in use, show an error message
             model.addAttribute("errorMessage", e.getMessage());
             return "config/register"; // Stay on register page with error
         }

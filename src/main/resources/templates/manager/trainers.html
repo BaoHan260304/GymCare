@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Huấn Luyện Viên</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/table.css}">
+</head>
+<body>
+<div class="container">
+    <h2>List Trainer</h2>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+    <div class="toolbar">
+        <a th:href="@{/manager/trainers/new}" class="btn">Create new account Trainer</a>
+    </div>
+
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone number</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="trainer : ${trainers}">
+            <td th:text="${trainer.id}"></td>
+            <td th:text="${trainer.userName}"></td>
+            <td th:text="${trainer.account.email}"></td>
+            <td th:text="${trainer.mobile}"></td>
+            <td>
+                <span th:class="${trainer.account.isActive} ? 'status-active' : 'status-inactive'"
+                      th:text="${trainer.account.isActive} ? 'Active' : 'Inactive'"></span>
+            </td>
+            <td>
+                <a th:href="@{/admin/users/edit/{id}(id=${trainer.id})}">Edit</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

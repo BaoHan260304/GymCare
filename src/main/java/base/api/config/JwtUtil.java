@@ -1,5 +1,7 @@
 package base.api.config;
 
+import base.api.model.Account;
+import base.api.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -23,12 +25,20 @@ public class JwtUtil {
     }
 
     public String generateToken(CustomUserDetails userDetails) {
+        // Step 1: Get the Account and User objects from CustomUserDetails
+        Account account = userDetails.getAccount();
+        User user = account.getUser();
+
+        // Handle cases where the user object might be null (though it shouldn't be in a valid login)
+        String userName = (user != null) ? user.getUserName() : account.getAccountName();
+        Long userId = (user != null) ? user.getId() : null;
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername()) // This is email
                 .claim("email", userDetails.getUsername())
-                .claim("user_name", userDetails.getUsername()) // Assuming username is email
-                .claim("role", userDetails.getRole())
-                .claim("id", userDetails.getId())
+                .claim("user_name", userName) // Use the actual user's name
+                .claim("role", account.getRole()) // Get role from the account
+                .claim("id", userId) // Get user's ID
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 100))
                 .signWith(key, SignatureAlgorithm.HS256)

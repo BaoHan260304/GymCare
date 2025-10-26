@@ -35,59 +35,54 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createUserIfNotExists(String role, AppDefaultUserProperties.DefaultUser user) {
-        Optional<User> existingOpt = userRepository.findByEmail(user.getEmail());
+        // Step 1: Check for existence using the Account repository, as email is now there.
+        Optional<Account> existingAccountOpt = accountRepository.findByEmail(user.getEmail());
 
-        if (existingOpt.isEmpty()) {
+        if (existingAccountOpt.isEmpty()) {
+            // --- Create New User and Account ---
             Account account = new Account();
             account.setAccountName(user.getEmail());
+            account.setEmail(user.getEmail());
+            account.setPassword(passwordEncoder.encode(user.getPassword()));
             account.setRole(role);
-            Account savedAccount = accountRepository.save(account);
+            account.setActive(true);
 
-            User u = new User();
-            u.setUserName(user.getName());
-            u.setEmail(user.getEmail());
-            u.setPassword(passwordEncoder.encode(user.getPassword()));
-            u.setMobile(user.getMobile() != null ? user.getMobile() : "0123456789");
-            u.setBirthday(parseDate(user.getBirthday(), LocalDate.of(1990, 1, 1)));
-            u.setIdentityCard(user.getIdentitycard() != null ? user.getIdentitycard() : "000000000");
-            u.setLicenceNumber(user.getLicencenumber() != null ? user.getLicencenumber() : "LC000000");
-            u.setLicenceDate(parseDate(user.getLicencedate(), LocalDate.now()));
-            u.setAccount(savedAccount);
+            User newUser = new User();
+            newUser.setUserName(user.getName());
+            newUser.setMobile(user.getMobile() != null ? user.getMobile() : "0123456789");
+            newUser.setBirthday(parseDate(user.getBirthday(), LocalDate.of(1990, 1, 1)));
+            newUser.setIdentityCard(user.getIdentitycard() != null ? user.getIdentitycard() : "000000000");
+            newUser.setAccount(account); // Link the user to the account
 
-            userRepository.save(u);
+            userRepository.save(newUser);
             System.out.println("Created " + role + " user: " + user.getEmail());
         } else {
-            User existing = existingOpt.get();
+            // --- Update Existing User and Account ---
+            Account existingAccount = existingAccountOpt.get();
+            User existingUser = existingAccount.getUser(); // Get the associated user
             boolean updated = false;
 
-            if (!passwordEncoder.matches(user.getPassword(), existing.getPassword())) {
-                existing.setPassword(passwordEncoder.encode(user.getPassword()));
+            // Update password on the Account entity
+            if (!passwordEncoder.matches(user.getPassword(), existingAccount.getPassword())) {
+                existingAccount.setPassword(passwordEncoder.encode(user.getPassword()));
                 updated = true;
             }
 
-            if (!existing.getUserName().equals(user.getName())) {
-                existing.setUserName(user.getName());
-                updated = true;
-            }
-
-            if (user.getMobile() != null && !user.getMobile().equals(existing.getMobile())) {
-                existing.setMobile(user.getMobile());
-                updated = true;
-            }
-
-            if (user.getBirthday() != null && !user.getBirthday().equals(existing.getBirthday().toString())) {
-                existing.setBirthday(LocalDate.parse(user.getBirthday()));
+            // Update personal info on the User entity
+            if (existingUser != null && !existingUser.getUserName().equals(user.getName())) {
+                existingUser.setUserName(user.getName());
                 updated = true;
             }
 
             if (updated) {
-                userRepository.save(existing);
+                // Saving the account will persist its changes. If user was changed, save it too.
+                accountRepository.save(existingAccount);
+                if (existingUser != null) userRepository.save(existingUser);
                 System.out.println("Updated info for: " + user.getEmail());
             } else {
                 System.out.println(role + " already exists, no changes.");
             }
         }
-
     }
 
     private LocalDate parseDate(String dateStr, LocalDate defaultDate) {
