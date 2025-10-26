@@ -25,15 +25,15 @@
     </div>
 
     <div sec:authorize="hasRole('TRAINER')">
-        <p>Go to <a th:href="@{/trainer/dashboard}">Customer Dashboard</a></p>
+        <p>Go to <a th:href="@{/trainer/dashboard}">Trainer Dashboard</a></p>
     </div>
 
     <div sec:authorize="hasRole('MANAGER')">
-        <p>Go to <a th:href="@{/manager/dashboard}">Customer Dashboard</a></p>
+        <p>Go to <a th:href="@{/manager/dashboard}">Manager Dashboard</a></p>
     </div>
 
     <div sec:authorize="hasRole('INVENTORY')">
-        <p>Go to <a th:href="@{/inventory/dashboard}">Customer Dashboard</a></p>
+        <p>Go to <a th:href="@{/inventory/dashboard}">Inventory Dashboard</a></p>
     </div>
 
     <form th:action="@{/perform_logout}" method="post" sec:authorize="isAuthenticated()">

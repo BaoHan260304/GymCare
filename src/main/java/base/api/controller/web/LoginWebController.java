@@ -21,13 +21,13 @@ public class LoginWebController {
         if (error != null) {
             model.addAttribute("errorMessage", "Invalid username or password.");
         }
-        return "login"; // Renders src/main/resources/templates/login.html
+        return "config/login"; // Renders src/main/resources/templates/login.html
     }
 
     @GetMapping("/register")
     public String registerForm(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
-        return "register"; // Renders src/main/resources/templates/register.html
+        return "config/register"; // Renders src/main/resources/templates/register.html
     }
 
     @PostMapping("/register")
@@ -46,7 +46,7 @@ public class LoginWebController {
             return "redirect:/login?registered=true"; // Redirect to login page with success message
         } catch (IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "register"; // Stay on register page with error
+            return "config/register"; // Stay on register page with error
         }
     }
 }

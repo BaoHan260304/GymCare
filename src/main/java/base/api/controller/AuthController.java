@@ -27,8 +27,15 @@ public class AuthController { // Renamed from AuthController to AuthController
     @PostMapping("/register")
     public ResponseEntity<?> registerCustomer(@RequestBody RegisterRequest request) {
         try {
-            Customer registeredCustomer = authService.registerCustomer(request.getName(), request.getEmail(), request.getPassword(), request.getMobile(), request.getBirthday().toString(), // Convert LocalDate to String for service method
-                    request.getIdentityCard(), request.getLicenceNumber(), request.getLicenceDate().toString() // Convert LocalDate to String for service method
+            Customer registeredCustomer = authService.registerCustomer(
+                    request.getName(),
+                    request.getEmail(),
+                    request.getPassword(),
+                    request.getMobile(),
+                    request.getBirthday().toString(), // Convert LocalDate to String for service method
+                    request.getIdentityCard(),
+                    request.getLicenceNumber(),
+                    request.getLicenceDate().toString() // Convert LocalDate to String for service method
             );
             return ResponseEntity.status(HttpStatus.CREATED).body("Customer registered successfully with ID: " + registeredCustomer.getId());
         } catch (IllegalStateException e) {
